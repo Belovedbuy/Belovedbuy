@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Read detailed reviews and info about this product. Find affordable, high-quality tech products with detailed reviews and Amazon, Konga or Jumia links.">
+  <meta name="keywords" content="product review, tech deals, product details, buy product, product price, belovedbuy">
+  <meta name="author" content="BelovedBuy">
+  <title>Product Detail - BelovedBuy</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .product-container {
+      background-color: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      margin: 30px auto;
+      max-width: 800px;
+    }
+    .product-container img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      margin-bottom: 20px;
+      background: #f4f4f4;
+    }
+    .product-meta { margin-bottom: 20px; }
+    .product-content-blog { margin: 24px 0; word-break: break-word; }
+    .buy-button {
+      display: inline-block;
+      background-color: #ff9900;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+    .buy-button:hover { background-color: #e68a00; }
+    .back-button {
+      display: inline-block; margin-top: 30px;
+    }
+    .back-button a { color: #333; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>BelovedBuy - Product Detail</h1>
+  </header>
+  <main class="product-container" id="productContainer">
+    <!-- Product details will be loaded here dynamically -->
+  </main>
+  <div class="back-button">
+    <a href="index.html">← Back to Home</a>
+  </div>
+  <footer>
+    <p>&copy; 2025 BelovedBuy. All rights reserved.</p>
+  </footer>
+  <script type="module">
+    import { db } from "./firebase.js";
+    import {
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-firestore.js";
+
+    async function loadProduct() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('id');
+      if (!productId) {
+        document.getElementById('productContainer').innerHTML = '<p>Product not found.</p>';
+        return;
+      }
+      try {
+        const docRef = doc(db, "products", productId);
+        const productSnap = await getDoc(docRef);
+        if (!productSnap.exists()) {
+          document.getElementById('productContainer').innerHTML = '<p>Product not found.</p>';
+          return;
+        }
+        const product = productSnap.data();
+        let linkLabel = "Buy on Amazon";
+        if (product.linkType === "konga") linkLabel = "Buy on Konga";
+        else if (product.linkType === "jumia") linkLabel = "Buy on Jumia";
+        document.getElementById('productContainer').innerHTML = `
+          <img src="${product.image}" alt="${product.title}">
+          <h1>${product.title}</h1>
+          <div class="product-meta">
+            <p><strong>Price:</strong> ${product.price}</p>
+            <p><strong>Rating:</strong> ${product.rating} ⭐</p>
+          </div>
+          <p>${product.description}</p>
+          <article class="product-content-blog" itemscope itemtype="http://schema.org/Article">
+            ${product.content}
+          </article>
+          <a href="${product.link}" class="buy-button" target="_blank" rel="nofollow sponsored noopener">${linkLabel}</a>
+        `;
+      } catch (error) {
+        document.getElementById('productContainer').innerHTML = '<p>Error loading product.</p>';
+      }
+    }
+    document.addEventListener('DOMContentLoaded', loadProduct);
+  </script>
+</body>
+</html>

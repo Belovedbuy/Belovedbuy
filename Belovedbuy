@@ -1,0 +1,13 @@
+belovedbuy-website/
+├── client/
+│   ├── public/
+│   │   ├── index.html
+│   │   ├── style.css
+│   │   └── script.js
+│   └── package.json
+├── server/
+│   ├── server.js
+│   └── package.json
+├── .gitignore
+├── README.md
+└── package.json
